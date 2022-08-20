@@ -32,6 +32,8 @@
 
         // add to cart
         $('bpdy').on('added_to_cart', function() {
+            getAddToCartData();
+
             console.log(GSDL_Vars);
 
             dataLayer.push({
@@ -88,6 +90,41 @@
         window.dataLayer.push({
             'event': 'hey_babe'
         });
+
+
+        /**
+         * Get Add To Cart Data - Product Page DOM
+         */
+        function getAddToCartData() {
+
+            // get the product ID of the added to cart item
+            var productID;
+            var variationID = $('[name="variation_id"]').first();
+        
+            // variable
+            if (typeof variationID !== 'undefined') {
+                productID = $(variationID).value;
+
+                // get the product data
+                var productData = $('form .variations_form').first();
+
+                if (typeof productData !== 'undefined') {
+                    
+                }
+            }
+            
+            // simple
+            else {
+                productID = $('[name="add-to-cart"]').first().value;
+            }
+
+            
+
+
+
+
+        }
+
     });
 
 })(jQuery, GSDL_Vars)

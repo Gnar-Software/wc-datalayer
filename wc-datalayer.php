@@ -26,10 +26,8 @@ class GSDL_datalayer_wc {
         add_action( 'wp_enqueue_scripts', [$this, 'enqueueScripts'] );
 
         // Add data to add to cart button
-        //add_filter( 'woocommerce_loop_add_to_cart_link', [$this, 'addToAddToCartBtn'] );
+        //add_filter( 'woocommerce_before_add_to_cart_button', [$this, 'productData'] );
 
-        // Add to cart
-        add_action( 'woocommerce_add_to_cart', [$this, 'addToCartTest'] );
 
     }
 
@@ -71,16 +69,42 @@ class GSDL_datalayer_wc {
     public function getProductData() {
         global $product;
 
-        $productData = get_page_by_path( $product, OBJECT, 'product' );
-        $productObj  = wc_get_product($productData->ID);
+        //$productData = get_page_by_path( $product, OBJECT, 'product' );
+        $productObj  = wc_get_product($product->get_id());
 
-        $GSDL_Vars = [
-            'name'     => $productObj->get_name(),
-            'id'       => $productObj->get_sku(),
-            'price'    => $productObj->get_price(),
-            'category' => $this->getProductCat($productData->ID),
-            'currency' => get_woocommerce_currency()
-        ];
+        $GSDL_Vars = [];
+
+        // variable
+        if (!empty($productObj) && $productObj->is_type('variable')) {
+            $GSDL_Vars['variations'] = [];
+
+            $variations = $productObj->get_children();
+
+            foreach ($variations as $variationID) {
+                $variationObj = wc_get_product($variationID);
+
+                $variation = [
+                    'name'     => $variationObj->get_name(),
+                    'id'       => $variationObj->get_sku(),
+                    'price'    => $variationObj->get_price(),
+                    'category' => $this->getProductCat($variationID),
+                    'currency' => get_woocommerce_currency()
+                ];
+
+                $GSDL_Vars['variations'][$variationID] = $variation;
+            }
+        }
+
+        // simple
+        else {
+            $GSDL_Vars = [
+                'name'     => $productObj->get_name(),
+                'id'       => $productObj->get_sku(),
+                'price'    => $productObj->get_price(),
+                'category' => $this->getProductCat($product->get_id()),
+                'currency' => get_woocommerce_currency()
+            ];
+        }
 
         return $GSDL_Vars;
     }
@@ -114,39 +138,6 @@ class GSDL_datalayer_wc {
     }
 
 
-    // /**
-    //  * Add additional product data to add to cart button
-    //  */
-    // public function addToAddToCartBtn($buttonHTML, $product, $args) {
-
-    //     $newStr = sprintf('data-product-currency="%s" data-product-category="%s" data-product-price="%s" data-product-sku',
-    //         get_woocommerce_currency(),
-    //         $this->getProductCat($product->get_id()),
-    //         $product->get_price()
-    //     );
-        
-    //     //str_replace()
-
-    //     return $buttonHTML;
-    // }
-
-
-    /**
-     * Add to cart - echo data layer push
-     */
-    public function addToCartTest() {
-
-        ?>
-        <script>
-            window.dataLayer = window.dataLayer || [];
-            window.dataLayer.push({
-            'event': 'new_subscriber',
-            'formLocation': 'footer'
-            });
-        </script>
-        <?php
-
-    }
 }
 
 new GSDL_datalayer_wc();
