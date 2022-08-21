@@ -10,12 +10,14 @@
 
         // init checkout trigger
         $('body').on('init_checkout', function() {
-            // to do
+            console.log('init checkout: ');
+            console.log(GSDL_Vars);
+            initCheckoutPush();
 
         });
 
         // add to cart ajax trigger
-        $('bpdy').on('added_to_cart', function() {
+        $('body').on('added_to_cart', function() {
             addToCartPush();
         });
 
@@ -43,7 +45,11 @@
          */
         function addToCartPush() {
             var productData = getAddToCartData();
-            var quantity = $('[name="quantity"]').first().val();
+            var quantity = 1;
+
+            if ($('[name="quantity"]').first().length !== 0) {
+                quantity = $('[name="quantity"]').first().val();
+            }
 
             dataLayer.push({ ecommerce: null });
             dataLayer.push({
@@ -87,6 +93,25 @@
                             'price': productData.price,
                             'category': productData.category
                         }]
+                    }
+                }
+            });
+        }
+
+
+        /**
+         * Init Checkout push
+         */
+        function initCheckoutPush() {
+            var products = GSDL_Vars.products;
+
+            dataLayer.push({ ecommerce: null });
+            dataLayer.push({
+                'event': 'checkout',
+                'ecommerce': {
+                    'checkout': {
+                        'actionField': {'step': 1},
+                        'products': products
                     }
                 }
             });
@@ -148,7 +173,7 @@
             // variable
             if (variationID.length !== 0) {
                 productID = $(variationID).val();
-                
+
                 if (GSDL_Vars.variations !== undefined) {
                     productData = GSDL_Vars.variations[productID];
                 }

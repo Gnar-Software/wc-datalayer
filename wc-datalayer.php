@@ -49,6 +49,11 @@ class GSDL_datalayer_wc {
             $GSDL_Vars = $this->getProductData();
         }
 
+        // init checkout
+        if (is_checkout()) {
+            $GSDL_Vars = $this->getCartData();
+        }
+
         // purchase data
         if (is_order_received_page()) {
             $GSDL_Vars = $this->getOrderData();
@@ -56,6 +61,40 @@ class GSDL_datalayer_wc {
 
         // add vars to script
         wp_add_inline_script( 'gsdl_wc_datalayer', 'const GSDL_Vars = ' . json_encode($GSDL_Vars), 'before' );
+    }
+
+
+    /**
+     * Get cart data for init checkout
+     * 
+     * @return array $GSDL_Vars
+     */
+    public function getCartData() {
+        $cart = WC()->cart;
+
+        $GSDL_Vars['products'] = [];
+
+        foreach ( WC()->cart->get_cart() as $key => $item ) {
+
+            $productID = $item['product_id'];
+
+            if (!empty($item['variation_id'])) {
+                $productID = $item['variation_id'];
+            }
+
+            $productObj = wc_get_product($productID);
+
+            $cartItem = [
+                'name'     => $item['data']->get_title(),
+                'id'       => $productObj->get_sku(),
+                'quantity' => $item['quantity'],
+                'price'    => $item['data']->get_price()
+            ];
+
+            array_push($GSDL_Vars['products'], $cartItem);
+        }
+
+        return $GSDL_Vars;
     }
 
 
