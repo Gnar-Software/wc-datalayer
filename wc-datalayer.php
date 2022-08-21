@@ -76,6 +76,17 @@ class GSDL_datalayer_wc {
 
         // variable
         if (!empty($productObj) && $productObj->is_type('variable')) {
+
+            // parent
+            $GSDL_Vars['parent'] = [
+                'name'     => $productObj->get_name(),
+                'id'       => $productObj->get_sku(),
+                'price'    => $productObj->get_price(),
+                'category' => $this->getProductCat($product->get_id()),
+                'currency' => get_woocommerce_currency()
+            ];
+
+            // variations
             $GSDL_Vars['variations'] = [];
 
             $variations = $productObj->get_children();
