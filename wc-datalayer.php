@@ -25,10 +25,6 @@ class GSDL_datalayer_wc {
         // Register & add data to script
         add_action( 'wp_enqueue_scripts', [$this, 'enqueueScripts'] );
 
-        // Add data to add to cart button
-        //add_filter( 'woocommerce_before_add_to_cart_button', [$this, 'productData'] );
-
-
     }
 
 
@@ -48,10 +44,12 @@ class GSDL_datalayer_wc {
         // setup vars
         $GSDL_Vars = [];
 
+        // product view & add to cart data
         if (is_product()) {
             $GSDL_Vars = $this->getProductData();
         }
 
+        // purchase data
         if (is_order_received_page()) {
             $GSDL_Vars = $this->getOrderData();
         }
@@ -128,6 +126,43 @@ class GSDL_datalayer_wc {
      */
     public function getOrderData() {
 
+        global $wp;
+
+        $orderID = $wp->query_vars['order-received'];
+        $order   = wc_get_order($orderID);
+
+        $GSDL_Vars = [
+            'id'       => $order->get_id(),
+            'revenue'  => $order->get_total(),
+            'tax'      => $order->get_total_tax(),
+            'shipping' => $order->get_shipping_total(),
+            'products' => []
+        ];
+
+        foreach ($order->get_items() as $item) {
+
+            $productID  = '';
+            $productObj = $item->get_product();
+
+            if ($productObj->is_type('variable')) {
+                $productID = $item->get_variation_id();
+            }
+            else {
+                $productID = $item->get_product_id();
+            }
+            
+            $productData = (object) [
+                'id'       => $productID,
+                'name'     => $item->get_name(),
+                'price'    => $item->get_total(),
+                'category' => $this->getProductCat($productID),
+                'quantity' => $item->get_quantity()
+            ];
+
+            array_push($GSDL_Vars['products'], $productData);
+        }
+
+        return $GSDL_Vars;
     }
 
 

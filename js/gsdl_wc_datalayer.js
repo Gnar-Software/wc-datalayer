@@ -5,18 +5,17 @@
 
         // item view trigger
         if ($('body').hasClass('single-product') || $('body').hasClass('single-product')) {
-            console.log(GSDL_Vars);
             itemViewPush();
         }
 
         // init checkout trigger
         $('body').on('init_checkout', function() {
-            console.log(GSDL_Vars);
+            // to do
+
         });
 
         // add to cart ajax trigger
         $('bpdy').on('added_to_cart', function() {
-            console.log(GSDL_Vars);
             addToCartPush();
         });
 
@@ -34,20 +33,17 @@
         });
 
         // purchase trigger
-        if (window.location.pathname == 'order-recieved') {
-            console.log('Purchase: ' + GSDL_Vars);
+        if (window.location.pathname.includes('order-received')) {
             purchasePush();
         }   
 
 
         /**
          * Add to cart push
-         * 
          */
         function addToCartPush() {
             var productData = getAddToCartData();
             var quantity = $('[name="quantity"]').first().val();
-            console.log(productData);
 
             dataLayer.push({ ecommerce: null });
             dataLayer.push({
@@ -102,28 +98,34 @@
          */
         function purchasePush() {
 
+            var actionField = {
+                'id': GSDL_Vars.id,
+                'revenue': GSDL_Vars.revenue,
+                'tax': GSDL_Vars.tax,
+                'shipping': GSDL_Vars.shipping
+            };
+
+            var products = [];
+
+            GSDL_Vars['products'].forEach(product => {
+
+                var item = {
+                    'name': product.name,
+                    'id': product.id,
+                    'price': product.price,
+                    'category': product.category,
+                    'quantity': product.quantity
+                };
+
+                products.push(item);
+            });
+            
             dataLayer.push({ ecommerce: null });
             dataLayer.push({
                 'ecommerce': {
                     'purchase': {
-                        'actionField': {
-                            'id': 'T12345',                         // Transaction ID. Required for purchases and refunds.
-                            'affiliation': 'Online Store',
-                            'revenue': '35.43',                     // Total transaction value (incl. tax and shipping)
-                            'tax':'4.90',
-                            'shipping': '5.99',
-                            'coupon': 'SUMMER_SALE'
-                        },
-                        'products': [{                            // List of productFieldObjects.
-                            'name': 'Triblend Android T-Shirt',     // Name or ID is required.
-                            'id': '12345',
-                            'price': '15.25',
-                            'brand': 'Google',
-                            'category': 'Apparel',
-                            'variant': 'Gray',
-                            'quantity': 1,
-                            'coupon': ''
-                        }]
+                        'actionField': actionField,
+                        'products': products
                     }
                 }
             });
@@ -146,8 +148,7 @@
             // variable
             if (variationID.length !== 0) {
                 productID = $(variationID).val();
-                console.log(productID);
-
+                
                 if (GSDL_Vars.variations !== undefined) {
                     productData = GSDL_Vars.variations[productID];
                 }
