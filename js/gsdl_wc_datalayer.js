@@ -13,13 +13,12 @@
             console.log('init checkout: ');
             console.log(GSDL_Vars);
             initCheckoutPush();
-
         });
 
         // add to cart ajax trigger
-        $('body').on('added_to_cart', function() {
+        if ($('body').hasClass('woocommerce-cart')) {
             addToCartPush();
-        });
+        }
 
         // add to cart non-ajax trigger
         $('.single-product .product form').one('submit', function(e) {
@@ -37,7 +36,7 @@
         // purchase trigger
         if (window.location.pathname.includes('order-received')) {
             purchasePush();
-        }   
+        }
 
 
         /**

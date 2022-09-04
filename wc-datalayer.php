@@ -1,8 +1,8 @@
 <?php
 
 /*
- * Plugin Name: Datalayer Events for WooCommerce
- * Description: Ecommerce data layer events for WooCommerce
+ * Plugin Name: Datalayer Events for WooCommerce (Maxi)
+ * Description: Ecommerce data layer events for WooCommerce (Maxi specific)
  * Version: 1.0.0
  * Author: gnar software
  * Author URI: https://www.gnar.co.uk/
@@ -44,9 +44,9 @@ class GSDL_datalayer_wc {
         // setup vars
         $GSDL_Vars = [];
 
-        // product view & add to cart data
-        if (is_product()) {
-            $GSDL_Vars = $this->getProductData();
+        // add to cart data
+        if (is_cart()) {
+            $GSDL_Vars = $this->getCartData();
         }
 
         // init checkout
@@ -106,7 +106,10 @@ class GSDL_datalayer_wc {
     public function getProductData() {
         global $product;
 
-        //$productData = get_page_by_path( $product, OBJECT, 'product' );
+        if (empty($product) || $product) {
+            return [];
+        }
+
         $productObj  = wc_get_product($product->get_id());
 
         $GSDL_Vars = [];
