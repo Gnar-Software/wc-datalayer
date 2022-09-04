@@ -42,14 +42,15 @@
          */
         function addToCartPush() {
             var products = GSDL_Vars.products;
+            console.log(GSDL_Vars);
 
             dataLayer.push({ ecommerce: null });
             dataLayer.push({
                 'event': 'addToCart',
                 'ecommerce': {
-                    'currencyCode': productData.currency,
+                    'currencyCode': GSDL_Vars.currencyCode,
                     'add': {
-                        'products': products
+                        'products': GSDL_Vars.products
                     }
                 }
             });

@@ -46,7 +46,10 @@ class GSDL_datalayer_wc {
 
         // add to cart data
         if (is_cart()) {
-            $GSDL_Vars = $this->getCartData();
+            $GSDL_Vars = (object) [
+                'products'     => $this->getCartData(),
+                'currencyCode' => get_woocommerce_currency()
+            ];
         }
 
         // init checkout
@@ -59,7 +62,7 @@ class GSDL_datalayer_wc {
             $GSDL_Vars = $this->getOrderData();
         }
 
-        // add vars to script
+        // add vars to script   
         wp_add_inline_script( 'gsdl_wc_datalayer', 'const GSDL_Vars = ' . json_encode($GSDL_Vars), 'before' );
     }
 
@@ -86,7 +89,7 @@ class GSDL_datalayer_wc {
 
             $cartItem = [
                 'name'     => $item['data']->get_title(),
-                'id'       => $productObj->get_sku(),
+                'id'       => $productID,
                 'quantity' => $item['quantity'],
                 'price'    => $item['data']->get_price()
             ];
