@@ -10,6 +10,7 @@
 
         // init checkout trigger
         $('body').on('init_checkout', function() {
+            $(this).append('<a type="hidden" id="hiddenCartTotal">' + GSDL_Vars.cartTotal + '</a>');
             initCheckoutPush();
         });
 
@@ -41,17 +42,12 @@
          * Add to cart push
          */
         function addToCartPush() {
-            var products = GSDL_Vars.products;
-            console.log(GSDL_Vars);
-
             dataLayer.push({ ecommerce: null });
             dataLayer.push({
                 'event': 'addToCart',
                 'ecommerce': {
                     'currencyCode': GSDL_Vars.currencyCode,
-                    'add': {
-                        'products': GSDL_Vars.products
-                    }
+                    'add': GSDL_Vars.products
                 }
             });
         }
@@ -90,15 +86,13 @@
          * Init Checkout push
          */
         function initCheckoutPush() {
-            var products = GSDL_Vars.products;
-
             dataLayer.push({ ecommerce: null });
             dataLayer.push({
                 'event': 'checkout',
                 'ecommerce': {
                     'checkout': {
                         'actionField': {'step': 1},
-                        'products': products
+                        'products': GSDL_Vars.products
                     }
                 }
             });

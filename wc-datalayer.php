@@ -48,13 +48,16 @@ class GSDL_datalayer_wc {
         if (is_cart()) {
             $GSDL_Vars = (object) [
                 'products'     => $this->getCartData(),
-                'currencyCode' => get_woocommerce_currency()
+                'currencyCode' => get_woocommerce_currency(),
             ];
         }
 
         // init checkout
         if (is_checkout()) {
-            $GSDL_Vars = $this->getCartData();
+            $GSDL_Vars = (object) [
+                'products'     => $this->getCartData(),
+                'cartTotal'    => WC()->cart->total
+            ];
         }
 
         // purchase data
@@ -68,7 +71,7 @@ class GSDL_datalayer_wc {
 
 
     /**
-     * Get cart data for init checkout
+     * Get cart data for init checkout & add to cart
      * 
      * @return array $GSDL_Vars
      */
