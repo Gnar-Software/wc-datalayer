@@ -39,7 +39,7 @@ class GSDL_datalayer_wc {
         }
 
         // enqueue script
-        wp_enqueue_script( 'gsdl_wc_datalayer', GSDL_JS_DIR . '/gsdl_wc_datalayer.js', array( 'jquery' ), '1.0.0' );
+        wp_enqueue_script( 'gsdl_wc_datalayer', GSDL_JS_DIR . '/gsdl_wc_datalayer.js', array( 'jquery' ), '1.0.8' );
 
         // setup vars
         $GSDL_Vars = [];
@@ -180,7 +180,8 @@ class GSDL_datalayer_wc {
             'revenue'  => $order->get_total(),
             'tax'      => $order->get_total_tax(),
             'shipping' => $order->get_shipping_total(),
-            'products' => []
+            'products' => [],
+            'currency' => $order->get_currency()
         ];
 
         foreach ($order->get_items() as $item) {
