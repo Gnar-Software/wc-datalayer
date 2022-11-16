@@ -1,6 +1,7 @@
 <?php
 
-/**
+/*
+ * Plugin Name: Datalayer Events for WooCommerce (Raceworks)
  * Description: Ecommerce data layer events for WooCommerce
  * Version: 1.0.0
  * Author: gnar software
@@ -21,16 +22,8 @@ class GSDL_datalayer_wc {
 
     public function __construct() {
 
-        // bail if WC isn't active
-        if (!class_exists('WooCommerce')) {
-            return;
-        }
-
         // Register scripts
         add_action( 'wp_enqueue_scripts', [$this, 'enqueueScripts'] );
-
-        // Localize scripts
-        add_action( 'init', [$this, 'localizeScripts'] );
 
     }
 
@@ -40,17 +33,13 @@ class GSDL_datalayer_wc {
      */
     public function enqueueScripts() {
 
+        // bail if WC isn't active
+        if (!class_exists('WooCommerce')) {
+            return;
+        }
+
         // enqueue script
         wp_enqueue_script( 'gsdl_wc_datalayer', GSDL_JS_DIR . '/gsdl_wc_datalayer.js', array( 'jquery' ), '1.0.0' );
-
-    }
-
-
-    /**
-     * Localize scripts
-     */
-    public function localizeScripts() {
-        die('got here');
 
         // setup vars
         $GSDL_Vars = [];
@@ -116,15 +105,14 @@ class GSDL_datalayer_wc {
      * @return array $GSDL_Vars
      */
     public function getProductData() {
-        global $product;
+        global $wp_query;
+        $post_id = $wp_query->post->ID;
 
-        // if (empty($product)) {
-        //     return [];
-        // }
+        if (empty($post_id)) {
+            return [];
+        }
 
-        //$productData = get_page_by_path( $product, OBJECT, 'product' );
-        $productObj = wc_get_product($product);
-        die(json_encode($productObj));
+        $productObj = wc_get_product($post_id);
 
         $GSDL_Vars = [];
 
@@ -136,7 +124,7 @@ class GSDL_datalayer_wc {
                 'name'     => $productObj->get_name(),
                 'id'       => $productObj->get_sku(),
                 'price'    => $productObj->get_price(),
-                'category' => $this->getProductCat($product->get_id()),
+                'category' => $this->getProductCat($productObj->get_id()),
                 'currency' => get_woocommerce_currency()
             ];
 
@@ -166,7 +154,7 @@ class GSDL_datalayer_wc {
                 'name'     => $productObj->get_name(),
                 'id'       => $productObj->get_sku(),
                 'price'    => $productObj->get_price(),
-                'category' => $this->getProductCat($product->get_id()),
+                'category' => $this->getProductCat($productObj->get_id()),
                 'currency' => get_woocommerce_currency()
             ];
         }
