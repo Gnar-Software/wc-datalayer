@@ -105,6 +105,10 @@ class GSDL_datalayer_wc {
     public function getProductData() {
         global $product;
 
+        if (empty($product)) {
+            return [];
+        }
+
         //$productData = get_page_by_path( $product, OBJECT, 'product' );
         $productObj = wc_get_product($product);
         die(json_encode($productObj));
