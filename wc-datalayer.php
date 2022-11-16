@@ -1,7 +1,6 @@
 <?php
 
-/*
- * Plugin Name: Datalayer Events for WooCommerce
+/**
  * Description: Ecommerce data layer events for WooCommerce
  * Version: 1.0.0
  * Author: gnar software
@@ -107,7 +106,8 @@ class GSDL_datalayer_wc {
         global $product;
 
         //$productData = get_page_by_path( $product, OBJECT, 'product' );
-        $productObj  = wc_get_product($product->get_id());
+        $productObj = wc_get_product($product);
+        die(json_encode($productObj));
 
         $GSDL_Vars = [];
 
