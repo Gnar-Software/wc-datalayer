@@ -21,8 +21,16 @@ class GSDL_datalayer_wc {
 
     public function __construct() {
 
-        // Register & add data to script
+        // bail if WC isn't active
+        if (!class_exists('WooCommerce')) {
+            return;
+        }
+
+        // Register scripts
         add_action( 'wp_enqueue_scripts', [$this, 'enqueueScripts'] );
+
+        // Localize scripts
+        add_action( 'init', [$this, 'localizeScripts'] );
 
     }
 
@@ -32,13 +40,17 @@ class GSDL_datalayer_wc {
      */
     public function enqueueScripts() {
 
-        // bail if WC isn't active
-        if (!class_exists('WooCommerce')) {
-            return;
-        }
-
         // enqueue script
         wp_enqueue_script( 'gsdl_wc_datalayer', GSDL_JS_DIR . '/gsdl_wc_datalayer.js', array( 'jquery' ), '1.0.0' );
+
+    }
+
+
+    /**
+     * Localize scripts
+     */
+    public function localizeScripts() {
+        die('got here');
 
         // setup vars
         $GSDL_Vars = [];
@@ -60,6 +72,7 @@ class GSDL_datalayer_wc {
 
         // add vars to script
         wp_add_inline_script( 'gsdl_wc_datalayer', 'const GSDL_Vars = ' . json_encode($GSDL_Vars), 'before' );
+        
     }
 
 
@@ -105,9 +118,9 @@ class GSDL_datalayer_wc {
     public function getProductData() {
         global $product;
 
-        if (empty($product)) {
-            return [];
-        }
+        // if (empty($product)) {
+        //     return [];
+        // }
 
         //$productData = get_page_by_path( $product, OBJECT, 'product' );
         $productObj = wc_get_product($product);
