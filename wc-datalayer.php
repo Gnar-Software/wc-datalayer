@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Plugin Name: Datalayer Events for WooCommerce (Raceworks)
+ * Plugin Name: Datalayer Events for WooCommerce (ABR Festival)
  * Description: Ecommerce data layer events for WooCommerce
  * Version: 1.0.0
  * Author: gnar software
@@ -44,14 +44,13 @@ class GSDL_datalayer_wc {
         // setup vars
         $GSDL_Vars = [];
 
-        // product view & add to cart data
-        if (is_product()) {
-            $GSDL_Vars = $this->getProductData();
-        }
-
-        // init checkout
+        // init checkout / add to cart fired here due to checkout forwarding
         if (is_checkout()) {
-            $GSDL_Vars = $this->getCartData();
+            // only fire init checkout / add to cart once per session
+            if (empty($_SESSION['add_to_cart_dl_fired'])) {
+                $_SESSION['add_to_cart_dl_fired'] = true;
+                $GSDL_Vars = $this->getCartData();
+            }
         }
 
         // purchase data
@@ -73,6 +72,7 @@ class GSDL_datalayer_wc {
     public function getCartData() {
         $cart = WC()->cart;
 
+        $GSDL_Vars['currency'] = 'GBP';
         $GSDL_Vars['products'] = [];
 
         foreach ( WC()->cart->get_cart() as $key => $item ) {
@@ -93,70 +93,6 @@ class GSDL_datalayer_wc {
             ];
 
             array_push($GSDL_Vars['products'], $cartItem);
-        }
-
-        return $GSDL_Vars;
-    }
-
-
-    /**
-     * Get product data for item view
-     * 
-     * @return array $GSDL_Vars
-     */
-    public function getProductData() {
-        global $wp_query;
-        $post_id = $wp_query->post->ID;
-
-        if (empty($post_id)) {
-            return [];
-        }
-
-        $productObj = wc_get_product($post_id);
-
-        $GSDL_Vars = [];
-
-        // variable
-        if (!empty($productObj) && $productObj->is_type('variable')) {
-
-            // parent
-            $GSDL_Vars['parent'] = [
-                'name'     => $productObj->get_name(),
-                'id'       => $productObj->get_sku(),
-                'price'    => $productObj->get_price(),
-                'category' => $this->getProductCat($productObj->get_id()),
-                'currency' => get_woocommerce_currency()
-            ];
-
-            // variations
-            $GSDL_Vars['variations'] = [];
-
-            $variations = $productObj->get_children();
-
-            foreach ($variations as $variationID) {
-                $variationObj = wc_get_product($variationID);
-
-                $variation = [
-                    'name'     => $variationObj->get_name(),
-                    'id'       => $variationObj->get_sku(),
-                    'price'    => $variationObj->get_price(),
-                    'category' => $this->getProductCat($variationID),
-                    'currency' => get_woocommerce_currency()
-                ];
-
-                $GSDL_Vars['variations'][$variationID] = $variation;
-            }
-        }
-
-        // simple
-        else {
-            $GSDL_Vars = [
-                'name'     => $productObj->get_name(),
-                'id'       => $productObj->get_sku(),
-                'price'    => $productObj->get_price(),
-                'category' => $this->getProductCat($productObj->get_id()),
-                'currency' => get_woocommerce_currency()
-            ];
         }
 
         return $GSDL_Vars;
