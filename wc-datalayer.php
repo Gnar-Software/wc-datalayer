@@ -39,7 +39,7 @@ class GSDL_datalayer_wc {
         }
 
         // enqueue script
-        wp_enqueue_script( 'gsdl_wc_datalayer', GSDL_JS_DIR . '/gsdl_wc_datalayer.js', array( 'jquery' ), '1.0.8' );
+        wp_enqueue_script( 'gsdl_wc_datalayer', GSDL_JS_DIR . '/gsdl_wc_datalayer.js', array( 'jquery' ), '1.1.0' );
 
         // setup vars
         $GSDL_Vars = [];
@@ -94,6 +94,8 @@ class GSDL_datalayer_wc {
 
             array_push($GSDL_Vars['products'], $cartItem);
         }
+
+        $GSDL_Vars['totalAddToCartVal'] = WC()->cart->total;
 
         return $GSDL_Vars;
     }
