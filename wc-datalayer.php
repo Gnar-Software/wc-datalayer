@@ -252,7 +252,7 @@ class GSDL_datalayer_wc {
         $productData = (object) [
             'id'       => $product_id,
             'name'     => $productObj->get_name(),
-            'price'    => $cart_item_data['rfb_price'],
+            'price'    => $productObj->get_price(),
             'category' => $this->getProductCat($product_id),
             'quantity' => $quantity
         ];
