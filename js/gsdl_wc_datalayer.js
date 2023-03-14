@@ -9,10 +9,13 @@
             itemViewPush();
         }
 
+        // add to cart trigger
+        if (GSDL_Vars.products_added !== undefined) {
+            addToCartPush();
+        }
+
         // init checkout trigger
         $('body').on('init_checkout', function() {
-            console.log('init checkout: ');
-            console.log(GSDL_Vars);
             initCheckoutPush();
         });
 
@@ -24,38 +27,12 @@
     });
 
 
-    // window load
-    $(window).load(function() {
-
-        // add to cart non-ajax trigger
-        var cartForm = $('form.cart');
-        console.log(cartForm);
-
-        $(cartForm).one('submit', function(e) {
-            //e.preventDefault();
-
-            try {
-                addToCartPush();
-            }
-            catch (err) { }
-
-            //$(this).submit();
-            return true;
-        });
-
-    });
-
-
     /**
      * Add to cart push
      */
     function addToCartPush() {
-        var productData = getAddToCartData();
-        var quantity = 1;
-
-        if ($('[name="quantity"]').first().length !== 0) {
-            quantity = $('[name="quantity"]').first().val();
-        }
+        productData = GSDL_Vars.products_added;
+        console.log('DL - added to cart triggered ', productData);
 
         dataLayer.push({ ecommerce: null });
         dataLayer.push({
@@ -68,7 +45,7 @@
                         'id': productData.id,
                         'price': productData.price,
                         'category': productData.category,
-                        'quantity': quantity
+                        'quantity': productData.quantity
                     }]
                 }
             }
@@ -162,38 +139,5 @@
             }
         });
     }
-
-
-    /**
-     * Get Add To Cart Data - Product Page DOM
-     * 
-     * @return object productData
-     */
-    function getAddToCartData() {
-
-        var productData;
-
-        // get the product ID of the added to cart item
-        var productID;
-        var variationID = $('[name="variation_id"]').first();
-    
-        // variable
-        if (variationID.length !== 0) {
-            productID = $(variationID).val();
-
-            if (GSDL_Vars.variations !== undefined) {
-                productData = GSDL_Vars.variations[productID];
-            }
-        }
-        
-        // simple
-        else {
-            productID = $('[name="add-to-cart"]').first().value;
-            productData = GSDL_Vars;
-        }
-
-        return productData;
-    }
-
 
 })(jQuery, GSDL_Vars)

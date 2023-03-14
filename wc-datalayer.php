@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Plugin Name: Datalayer Events for WooCommerce (Raceworks)
+ * Plugin Name: Datalayer Events for WooCommerce
  * Description: Ecommerce data layer events for WooCommerce
  * Version: 1.0.0
  * Author: gnar software
@@ -22,8 +22,13 @@ class GSDL_datalayer_wc {
 
     public function __construct() {
 
+        session_start();
+
         // Register scripts
         add_action( 'wp_enqueue_scripts', [$this, 'enqueueScripts'] );
+
+        // Add to cart hook
+        add_action( 'woocommerce_add_to_cart', [$this, 'addToCartSetSessionVar'], 10, 6 );
 
     }
 
@@ -44,14 +49,20 @@ class GSDL_datalayer_wc {
         // setup vars
         $GSDL_Vars = [];
 
-        // product view & add to cart data
+        // product view
         if (is_product()) {
             $GSDL_Vars = $this->getProductData();
         }
 
+        // add to cart (using session var)
+        if (!empty($_SESSION['gsdl_cart_item_added'])) {
+            $GSDL_Vars['products_added'] = $_SESSION['gsdl_cart_item_added'];
+            unset($_SESSION['gsdl_cart_item_added']);
+        }
+
         // init checkout
         if (is_checkout()) {
-            $GSDL_Vars = $this->getCartData();
+            $GSDL_Vars['products'] = $this->getCartData();
         }
 
         // purchase data
@@ -68,12 +79,12 @@ class GSDL_datalayer_wc {
     /**
      * Get cart data for init checkout
      * 
-     * @return array $GSDL_Vars
+     * @return array $products
      */
     public function getCartData() {
         $cart = WC()->cart;
 
-        $GSDL_Vars['products'] = [];
+        $products = [];
 
         foreach ( WC()->cart->get_cart() as $key => $item ) {
 
@@ -92,10 +103,10 @@ class GSDL_datalayer_wc {
                 'price'    => $item['data']->get_price()
             ];
 
-            array_push($GSDL_Vars['products'], $cartItem);
+            array_push($products, $cartItem);
         }
 
-        return $GSDL_Vars;
+        return $products;
     }
 
 
@@ -228,6 +239,26 @@ class GSDL_datalayer_wc {
         return $productFirstCat;
     }
 
+
+
+    /**
+     * Set add to cart data as session var
+     */
+    public function addToCartSetSessionVar( $cart_item_key, $product_id, $quantity, $variation_id, $variation, $cart_item_data ) {
+
+        $data['currency'] = get_woocommerce_currency(); 
+        $productObj = wc_get_product($product_id);
+        
+        $productData = (object) [
+            'id'       => $product_id,
+            'name'     => $productObj->get_name(),
+            'price'    => $cart_item_data['rfb_price'],
+            'category' => $this->getProductCat($product_id),
+            'quantity' => $quantity
+        ];
+
+        $_SESSION['gsdl_cart_item_added'] = $productData;
+    }
 
 }
 
