@@ -43,7 +43,7 @@
                     'products': [{
                         'name': productData.name,
                         'id': productData.id,
-                        'price': productData.price,
+                        'price': parseFloat(productData.price),
                         'category': productData.category,
                         'quantity': productData.quantity
                     }]
@@ -73,7 +73,7 @@
                     'products': [{
                         'name': productData.name,
                         'id': productData.id,
-                        'price': productData.price,
+                        'price': parseFloat(productData.price),
                         'category': productData.category
                     }]
                 }
@@ -108,7 +108,7 @@
 
         var actionField = {
             'id': GSDL_Vars.id,
-            'revenue': GSDL_Vars.revenue,
+            'revenue': parseFloat(GSDL_Vars.revenue),
             'tax': GSDL_Vars.tax,
             'shipping': GSDL_Vars.shipping
         };
@@ -120,7 +120,7 @@
             var item = {
                 'name': product.name,
                 'id': product.id,
-                'price': product.price,
+                'price': parseFloat(product.price),
                 'category': product.category,
                 'quantity': product.quantity
             };
