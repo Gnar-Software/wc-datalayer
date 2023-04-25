@@ -44,7 +44,7 @@ class GSDL_datalayer_wc {
         }
 
         // enqueue script
-        wp_enqueue_script( 'gsdl_wc_datalayer', GSDL_JS_DIR . '/gsdl_wc_datalayer.js', array( 'jquery' ), '1.0.9' );
+        wp_enqueue_script( 'gsdl_wc_datalayer', GSDL_JS_DIR . '/gsdl_wc_datalayer_v1_1_0.js', array( 'jquery' ), '1.1.0' );
 
         // setup vars
         $GSDL_Vars = [];
