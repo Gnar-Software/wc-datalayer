@@ -3,7 +3,7 @@
 /*
  * Plugin Name: Datalayer Events for WooCommerce
  * Description: Ecommerce data layer events for WooCommerce
- * Version: 1.0.0
+ * Version: 1.2.0
  * Author: gnar software
  * Author URI: https://www.gnar.co.uk/
  * License: GPLv2 or later
@@ -22,7 +22,9 @@ class GSDL_datalayer_wc {
 
     public function __construct() {
 
-        session_start();
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            session_start();
+        }
 
         // Register scripts
         add_action( 'wp_enqueue_scripts', [$this, 'enqueueScripts'] );
@@ -44,7 +46,7 @@ class GSDL_datalayer_wc {
         }
 
         // enqueue script
-        wp_enqueue_script( 'gsdl_wc_datalayer', GSDL_JS_DIR . '/gsdl_wc_datalayer_v1_1_0.js', array( 'jquery' ), '1.1.0' );
+        wp_enqueue_script( 'gsdl_wc_datalayer', GSDL_JS_DIR . '/gsdl_wc_datalayer.js', ['jquery'], '1.2.0' );
 
         // setup vars
         $GSDL_Vars = [];
@@ -52,12 +54,6 @@ class GSDL_datalayer_wc {
         // product view
         if (is_product()) {
             $GSDL_Vars = $this->getProductData();
-        }
-
-        // add to cart (using session var)
-        if (!empty($_SESSION['gsdl_cart_item_added'])) {
-            $GSDL_Vars['products_added'] = $_SESSION['gsdl_cart_item_added'];
-            unset($_SESSION['gsdl_cart_item_added']);
         }
 
         // init checkout
@@ -240,7 +236,6 @@ class GSDL_datalayer_wc {
     }
 
 
-
     /**
      * Set add to cart data as session var
      */
@@ -257,7 +252,11 @@ class GSDL_datalayer_wc {
             'quantity' => $quantity
         ];
 
-        $_SESSION['gsdl_cart_item_added'] = $productData;
+        try {
+            $_SESSION['gsdl_cart_item_added'] = $productData;
+        } catch (Exception $e) {
+            return;
+        }
     }
 
 }
