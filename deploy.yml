@@ -1,0 +1,18 @@
+---
+- name: Package code
+  hosts: localhost
+
+  vars:
+    plugin_name: "wc-datalayer"
+    plugin_version: "1.2.0"
+
+
+  tasks:
+    - name: Select files to copy
+      ansible.builtin.command: rsync -av --delete --exclude 'build/{{ plugin_version }}' --exclude 'build' --exclude '.gitignore' --exclude 'README.md' --exclude '.git' --exclude '.playbooks' --exclude 'dev.md' --exclude 'deploy.yml' ./ ./build/{{ plugin_version }}/{{ plugin_name }}/
+
+    - name: Zip files
+      archive:
+        path: "./build/{{ plugin_version }}/{{ plugin_name }}"
+        dest: "./build/{{ plugin_version }}/{{ plugin_name }}.zip"
+        format: zip
