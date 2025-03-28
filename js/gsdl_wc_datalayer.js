@@ -9,9 +9,13 @@
             itemViewPush();
         }
 
-        // add to cart trigger
-        if (GSDL_Vars.products_added !== undefined) {
-            addToCartPush();
+        // add to cart trigger if cookie gsdl_add_to_cart is set
+        const addToCartCookie = Cookies.get('gsdl_add_to_cart');
+
+        if (addToCartCookie) {
+            const addToCartData = JSON.parse(Cookies.get('gsdl_add_to_cart'));
+            addToCartPush(addToCartData);
+            Cookies.remove('gsdl_add_to_cart');
         }
 
         // init checkout trigger
@@ -29,9 +33,10 @@
 
     /**
      * Add to cart push
+     * 
+     * @param {object} productData
      */
-    function addToCartPush() {
-        productData = GSDL_Vars.products_added;
+    function addToCartPush(productData) {
         console.log('DL - added to cart triggered ', productData);
 
         dataLayer.push({ ecommerce: null });

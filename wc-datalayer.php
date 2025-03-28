@@ -3,7 +3,7 @@
 /*
  * Plugin Name: Datalayer Events for WooCommerce
  * Description: Ecommerce data layer events for WooCommerce
- * Version: 1.2.0
+ * Version: 1.3.0
  * Author: gnar software
  * Author URI: https://www.gnar.co.uk/
  * License: GPLv2 or later
@@ -22,15 +22,11 @@ class GSDL_datalayer_wc {
 
     public function __construct() {
 
-        if (session_status() !== PHP_SESSION_ACTIVE) {
-            session_start();
-        }
-
         // Register scripts
         add_action( 'wp_enqueue_scripts', [$this, 'enqueueScripts'] );
 
         // Add to cart hook
-        add_action( 'woocommerce_add_to_cart', [$this, 'addToCartSetSessionVar'], 10, 6 );
+        add_action( 'woocommerce_add_to_cart', [$this, 'addToCartSetCookie'], 10, 6 );
 
     }
 
@@ -46,7 +42,7 @@ class GSDL_datalayer_wc {
         }
 
         // enqueue script
-        wp_enqueue_script( 'gsdl_wc_datalayer', GSDL_JS_DIR . '/gsdl_wc_datalayer.js', ['jquery'], '1.2.0' );
+        wp_enqueue_script( 'gsdl_wc_datalayer', GSDL_JS_DIR . '/gsdl_wc_datalayer.js', ['jquery'], '1.3.0' );
 
         // setup vars
         $GSDL_Vars = [];
@@ -239,7 +235,7 @@ class GSDL_datalayer_wc {
     /**
      * Set add to cart data as session var
      */
-    public function addToCartSetSessionVar( $cart_item_key, $product_id, $quantity, $variation_id, $variation, $cart_item_data ) {
+    public function addToCartSetCookie( $cart_item_key, $product_id, $quantity, $variation_id, $variation, $cart_item_data ) {
 
         $data['currency'] = get_woocommerce_currency(); 
         $productObj = wc_get_product($product_id);
@@ -252,11 +248,8 @@ class GSDL_datalayer_wc {
             'quantity' => $quantity
         ];
 
-        try {
-            $_SESSION['gsdl_cart_item_added'] = $productData;
-        } catch (Exception $e) {
-            return;
-        }
+        // set cookie
+        setcookie('gsdl_add_to_cart', json_encode($productData), time() + 3600, '/');
     }
 
 }

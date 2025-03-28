@@ -4,7 +4,7 @@
 
   vars:
     plugin_name: "wc-datalayer"
-    plugin_version: "1.2.0"
+    plugin_version: "1.3.0"
 
 
   tasks:
